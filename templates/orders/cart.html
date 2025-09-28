@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - Trade-Hub{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Shopping Cart</h1>
+        
+        {% if cart.items.exists %}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Cart Items -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        {% for item in cart.items.all %}
+                            <div class="flex items-center space-x-4 py-4 border-b border-gray-200 last:border-b-0">
+                                <div class="flex-shrink-0">
+                                    {% if item.product.images.first %}
+                                        <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}" class="w-16 h-16 object-cover rounded">
+                                    {% else %}
+                                        <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                                            <i class="fas fa-image text-gray-400"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-800">{{ item.product.name }}</h3>
+                                    <p class="text-sm text-gray-600">by {{ item.product.vendor.store_name }}</p>
+                                    {% if item.variant %}
+                                        <p class="text-sm text-gray-500">{{ item.variant.name }}: {{ item.variant.value }}</p>
+                                    {% endif %}
+                                    
+                                    <!-- Inventory Status -->
+                                    {% if item.product.track_inventory %}
+                                        {% if item.product.stock_quantity < item.quantity %}
+                                            <div class="flex items-center mt-1">
+                                                <i class="fas fa-exclamation-triangle text-red-500 text-xs mr-1"></i>
+                                                <span class="text-red-600 text-xs">Only {{ item.product.stock_quantity }} in stock</span>
+                                            </div>
+                                        {% elif item.product.stock_quantity <= 5 %}
+                                            <div class="flex items-center mt-1">
+                                                <i class="fas fa-clock text-yellow-500 text-xs mr-1"></i>
+                                                <span class="text-yellow-600 text-xs">Low stock: {{ item.product.stock_quantity }} remaining</span>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="flex items-center space-x-2">
+                                    <form method="POST" action="{% url 'orders:add_to_cart' item.product.id %}" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value="-1">
+                                        <button type="submit" class="bg-gray-200 text-gray-600 w-8 h-8 rounded hover:bg-gray-300">-</button>
+                                    </form>
+                                    <span class="w-8 text-center">{{ item.quantity }}</span>
+                                    <form method="POST" action="{% url 'orders:add_to_cart' item.product.id %}" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="bg-gray-200 text-gray-600 w-8 h-8 rounded hover:bg-gray-300">+</button>
+                                    </form>
+                                </div>
+                                
+                                <div class="text-right">
+                                    <p class="font-semibold text-gray-800">${{ item.total_price }}</p>
+                                    <form method="POST" action="{% url 'orders:remove_from_cart' item.id %}" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Order Summary -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">Order Summary</h2>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Subtotal ({{ cart.total_items }} items)</span>
+                                <span class="font-semibold">${{ cart.total_price }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Shipping</span>
+                                <span class="font-semibold">Free</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Tax</span>
+                                <span class="font-semibold">$0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t pt-4 mb-6">
+                            <div class="flex justify-between text-lg font-bold">
+                                <span>Total</span>
+                                <span>${{ cart.total_price }}</span>
+                            </div>
+                        </div>
+                        
+                        <a href="{% url 'orders:checkout' %}" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 block text-center">
+                            Proceed to Checkout
+                        </a>
+                        
+                        <a href="{% url 'core:search' %}" class="w-full mt-3 border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-50 transition duration-300 block text-center">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <!-- Empty Cart -->
+            <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                <i class="fas fa-shopping-cart text-gray-400 text-6xl mb-4"></i>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Your cart is empty</h2>
+                <p class="text-gray-600 mb-8">Looks like you haven't added any items to your cart yet.</p>
+                <a href="{% url 'core:search' %}" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+                    Start Shopping
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

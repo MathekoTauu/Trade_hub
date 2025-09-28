@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+                               <a href="{% url 'vendors:register' %}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Sign Up</a><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Trade-Hub - Multi-Vendor E-Commerce Platform{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'core:home' %}" class="flex items-center space-x-2">
+                        <i class="fas fa-store text-2xl text-blue-600"></i>
+                        <span class="text-xl font-bold text-gray-800">Trade-Hub</span>
+                    </a>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-lg mx-8">
+                    <form action="{% url 'core:search' %}" method="GET" class="relative">
+                        <input type="text" name="q" placeholder="Search products, vendors, categories..."
+                               class="w-full px-4 py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        <button type="submit" class="absolute right-2 top-1 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">
+                            Search
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Navigation Links -->
+                <div class="flex items-center space-x-4">
+                    {% if user.is_authenticated %}
+                        <div class="relative group">
+                            <button class="flex items-center space-x-1 text-gray-700 hover:text-blue-600">
+                                <i class="fas fa-user"></i>
+                                <span>{{ user.first_name|default:user.username }}</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Orders</a>
+                                {% if user.vendor %}
+                                    <a href="{% url 'vendors:dashboard' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Vendor Dashboard</a>
+                                {% endif %}
+                                <hr class="my-1">
+                                <form method="post" action="{% url 'logout' %}" class="block">
+                                    {% csrf_token %}
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="text-gray-700 hover:text-blue-600">Login</a>
+                        <a href="{% url 'core:signup' %}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Sign Up</a>
+                    {% endif %}
+                    
+                    <!-- Cart -->
+                    <a href="{% url 'orders:cart' %}" class="relative text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        {% if cart_items_count > 0 %}
+                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cart_items_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Secondary Navigation -->
+    <div class="bg-gray-100 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-center space-x-8 py-3">
+                <a href="{% url 'core:home' %}" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium">
+                    <i class="fas fa-home mr-1"></i>Home
+                </a>
+                <a href="{% url 'products:list' %}" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium">
+                    <i class="fas fa-box mr-1"></i>Products
+                </a>
+                <a href="{% url 'vendors:list' %}" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium">
+                    <i class="fas fa-store mr-1"></i>Vendors
+                </a>
+                <a href="{% url 'vendors:register' %}" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium">
+                    <i class="fas fa-plus-circle mr-1"></i>Become a Vendor
+                </a>
+                <a href="{% url 'core:about' %}" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium">
+                    <i class="fas fa-info-circle mr-1"></i>About
+                </a>
+                <a href="{% url 'core:contact' %}" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium">
+                    <i class="fas fa-envelope mr-1"></i>Contact
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} bg-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-100 border border-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-400 text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-700 px-4 py-3 rounded mb-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fas fa-store text-2xl text-blue-400"></i>
+                        <span class="text-xl font-bold">Trade-Hub</span>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        Your trusted multi-vendor e-commerce platform connecting buyers with quality vendors worldwide.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-blue-400"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-blue-400"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-blue-400"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-blue-400"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'core:home' %}" class="text-gray-300 hover:text-white">Home</a></li>
+                        <li><a href="{% url 'core:search' %}" class="text-gray-300 hover:text-white">Browse Products</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Vendors</a></li>
+                        <li><a href="{% url 'core:about' %}" class="text-gray-300 hover:text-white">About Us</a></li>
+                        <li><a href="{% url 'core:contact' %}" class="text-gray-300 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Customer Service -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Customer Service</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white">FAQ</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Shipping Info</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Returns</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Track Order</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Support</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Newsletter -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Stay Updated</h3>
+                    <p class="text-gray-300 mb-4">Subscribe to our newsletter for the latest updates and offers.</p>
+                    <form action="{% url 'core:newsletter_subscribe' %}" method="POST" class="flex">
+                        {% csrf_token %}
+                        <input type="email" name="email" placeholder="Your email" 
+                               class="flex-1 px-3 py-2 border border-gray-600 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white">
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Bottom Footer -->
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-300">
+                    &copy; 2025 Trade-Hub. All rights reserved. | 
+                    <a href="#" class="hover:text-white">Privacy Policy</a> | 
+                    <a href="#" class="hover:text-white">Terms of Service</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

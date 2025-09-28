@@ -1,0 +1,23 @@
+# Core Django
+Django==5.2.6
+djangorestframework==3.15.2
+
+# Database
+mysqlclient==2.2.4  # For MariaDB/MySQL support
+
+# Environment management
+python-dotenv==1.0.1
+
+# Image handling
+Pillow==10.4.0
+
+# Twitter API (optional - for social features)
+tweepy==4.14.0
+
+# Development dependencies (optional)
+# django-debug-toolbar==4.4.6
+# django-extensions==3.2.3
+
+# Production dependencies (optional)
+# gunicorn==21.2.0
+# whitenoise==6.7.0

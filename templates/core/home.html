@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-gradient text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6">
+            Welcome to Trade-Hub
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 text-blue-100">
+            Discover unique products from trusted vendors worldwide
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'core:search' %}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+                <i class="fas fa-search mr-2"></i>Browse Products
+            </a>
+            <a href="#" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition duration-300">
+                <i class="fas fa-store mr-2"></i>Become a Vendor
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Categories -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Shop by Category</h2>
+            <p class="text-gray-600">Explore our wide range of product categories</p>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {% for category in categories %}
+                <a href="{% url 'core:search' %}?category={{ category.slug }}" class="group">
+                    <div class="bg-white rounded-lg shadow-md p-6 text-center card-hover">
+                        {% if category.image %}
+                            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="w-16 h-16 mx-auto mb-4 rounded-full object-cover">
+                        {% else %}
+                            <div class="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-tag text-blue-600 text-2xl"></i>
+                            </div>
+                        {% endif %}
+                        <h3 class="font-semibold text-gray-800 group-hover:text-blue-600 transition duration-300">{{ category.name }}</h3>
+                    </div>
+                </a>
+            {% empty %}
+                <div class="col-span-full text-center text-gray-500">
+                    <i class="fas fa-box-open text-4xl mb-4"></i>
+                    <p>No categories available yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="py-16 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Featured Products</h2>
+            <p class="text-gray-600">Handpicked products from our top vendors</p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for product in featured_products %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                    <div class="relative">
+                        {% if product.images.first %}
+                            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover">
+                        {% else %}
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-image text-gray-400 text-3xl"></i>
+                            </div>
+                        {% endif %}
+                        {% if product.discount_percentage %}
+                            <span class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-sm font-semibold">
+                                -{{ product.discount_percentage }}%
+                            </span>
+                        {% endif %}
+                        <button class="absolute top-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition duration-300">
+                            <i class="fas fa-heart text-gray-400 hover:text-red-500"></i>
+                        </button>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2">{{ product.name }}</h3>
+                        <p class="text-sm text-gray-600 mb-2">by {{ product.vendor.store_name }}</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-lg font-bold text-blue-600">${{ product.price }}</span>
+                                {% if product.compare_price %}
+                                    <span class="text-sm text-gray-500 line-through">${{ product.compare_price }}</span>
+                                {% endif %}
+                            </div>
+                            <form method="POST" action="{% url 'orders:add_to_cart' product.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition duration-300">
+                                    <i class="fas fa-cart-plus mr-1"></i>Add
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center text-gray-500">
+                    <i class="fas fa-box-open text-4xl mb-4"></i>
+                    <p>No featured products available yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+        
+        {% if featured_products %}
+            <div class="text-center mt-8">
+                <a href="{% url 'core:search' %}" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+                    View All Products
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Latest Products -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Latest Arrivals</h2>
+            <p class="text-gray-600">Fresh products just added to our marketplace</p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for product in latest_products %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                    <div class="relative">
+                        {% if product.images.first %}
+                            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover">
+                        {% else %}
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-image text-gray-400 text-3xl"></i>
+                            </div>
+                        {% endif %}
+                        <span class="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-sm font-semibold">
+                            New
+                        </span>
+                        <button class="absolute top-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition duration-300">
+                            <i class="fas fa-heart text-gray-400 hover:text-red-500"></i>
+                        </button>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2">{{ product.name }}</h3>
+                        <p class="text-sm text-gray-600 mb-2">by {{ product.vendor.store_name }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-lg font-bold text-blue-600">${{ product.price }}</span>
+                            <form method="POST" action="{% url 'orders:add_to_cart' product.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition duration-300">
+                                    <i class="fas fa-cart-plus mr-1"></i>Add
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center text-gray-500">
+                    <i class="fas fa-box-open text-4xl mb-4"></i>
+                    <p>No latest products available yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 bg-blue-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Why Choose Trade-Hub?</h2>
+            <p class="text-gray-600">Experience the best of multi-vendor e-commerce</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="bg-blue-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Trusted Vendors</h3>
+                <p class="text-gray-600">All vendors are verified and trusted to ensure quality products and reliable service.</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="bg-blue-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shipping-fast text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Fast Shipping</h3>
+                <p class="text-gray-600">Quick and reliable shipping options to get your products delivered on time.</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="bg-blue-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-headset text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">24/7 Support</h3>
+                <p class="text-gray-600">Round-the-clock customer support to help you with any questions or issues.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

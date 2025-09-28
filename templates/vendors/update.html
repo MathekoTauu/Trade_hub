@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Store - Trade-Hub{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <div class="text-center mb-8">
+                <i class="fas fa-store text-blue-600 text-4xl mb-4"></i>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Edit Your Store</h1>
+                <p class="text-gray-600">Update your store information</p>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="id_store_name" class="block text-sm font-medium text-gray-700 mb-2">Store Name *</label>
+                        <input type="text" name="store_name" id="id_store_name" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               value="{{ form.store_name.value|default:vendor.store_name }}">
+                    </div>
+                    
+                    <div>
+                        <label for="id_phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <input type="tel" name="phone" id="id_phone"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               value="{{ form.phone.value|default:vendor.phone }}">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="id_store_description" class="block text-sm font-medium text-gray-700 mb-2">Store Description</label>
+                    <textarea name="store_description" id="id_store_description" rows="4"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="Tell customers about your store...">{{ form.store_description.value|default:vendor.store_description }}</textarea>
+                </div>
+                
+                <div>
+                    <label for="id_store_logo" class="block text-sm font-medium text-gray-700 mb-2">Store Logo</label>
+                    {% if vendor.store_logo %}
+                        <div class="mb-4">
+                            <img src="{{ vendor.store_logo.url }}" alt="Current logo" class="w-20 h-20 rounded-lg object-cover">
+                            <p class="text-sm text-gray-500 mt-1">Current logo</p>
+                        </div>
+                    {% endif %}
+                    <input type="file" name="store_logo" id="id_store_logo" accept="image/*"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-sm text-gray-500 mt-1">Upload a new logo (JPG, PNG, or GIF format)</p>
+                </div>
+                
+                <div>
+                    <label for="id_address" class="block text-sm font-medium text-gray-700 mb-2">Business Address</label>
+                    <textarea name="address" id="id_address" rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="Your business address...">{{ form.address.value|default:vendor.address }}</textarea>
+                </div>
+                
+                <div>
+                    <label for="id_twitter_handle" class="block text-sm font-medium text-gray-700 mb-2">Twitter Handle</label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 py-2 border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm rounded-l-md">
+                            @
+                        </span>
+                        <input type="text" name="twitter_handle" id="id_twitter_handle"
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               value="{{ form.twitter_handle.value|default:vendor.twitter_handle }}"
+                               placeholder="yourusername">
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-4">
+                    <a href="{% url 'vendors:dashboard' %}" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition duration-300">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+                        <i class="fas fa-save mr-2"></i>Update Store
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

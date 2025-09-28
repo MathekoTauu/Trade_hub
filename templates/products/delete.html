@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Product - Trade-Hub{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <div class="text-center mb-8">
+                <i class="fas fa-exclamation-triangle text-red-600 text-6xl mb-4"></i>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Delete Product</h1>
+                <p class="text-gray-600">This action cannot be undone</p>
+            </div>
+            
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+                <div class="flex items-start">
+                    {% if object.images.exists %}
+                        <img src="{{ object.images.first.image.url }}" alt="{{ object.name }}" class="h-16 w-16 object-cover rounded-lg mr-4">
+                    {% else %}
+                        <div class="h-16 w-16 bg-gray-200 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-image text-gray-400"></i>
+                        </div>
+                    {% endif %}
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-red-800 mb-2">{{ object.name }}</h3>
+                        <p class="text-sm text-red-700 mb-2">{{ object.short_description|default:object.description|truncatewords:20 }}</p>
+                        <div class="flex items-center space-x-4 text-sm text-red-600">
+                            <span><i class="fas fa-tag mr-1"></i>${{ object.price }}</span>
+                            <span><i class="fas fa-folder mr-1"></i>{{ object.category.name }}</span>
+                            <span><i class="fas fa-calendar mr-1"></i>{{ object.created_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+                <h3 class="font-semibold text-yellow-800 mb-2">⚠️ Warning</h3>
+                <ul class="text-sm text-yellow-700 space-y-1">
+                    <li>• This will permanently remove the product from your store</li>
+                    <li>• Customers will no longer be able to view or purchase this product</li>
+                    <li>• This action cannot be undone</li>
+                    <li>• Any pending orders for this product will not be affected</li>
+                </ul>
+            </div>
+            
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" required class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                        <span class="ml-2 text-sm text-gray-700">
+                            I understand that this action is permanent and cannot be undone
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="flex justify-end space-x-4">
+                    <a href="{% url 'products:vendor_list' %}" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition duration-300">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition duration-300">
+                        <i class="fas fa-trash mr-2"></i>Delete Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

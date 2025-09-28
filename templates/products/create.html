@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Product - Trade-Hub{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Add New Product</h1>
+                    <p class="text-gray-600">Create a new product for your store</p>
+                </div>
+                <a href="{% url 'vendors:dashboard' %}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-300">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                </a>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Product Name *
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {% for error in form.name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Category *
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {% for error in form.category.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="{{ form.short_description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Short Description
+                    </label>
+                    {{ form.short_description }}
+                    {% if form.short_description.errors %}
+                        <div class="text-red-600 text-sm mt-1">
+                            {% for error in form.short_description.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <p class="text-sm text-gray-500 mt-1">Brief summary of the product (max 300 characters)</p>
+                </div>
+                
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Full Product Description *
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-red-600 text-sm mt-1">
+                            {% for error in form.description.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="{{ form.price.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Price ($) *
+                        </label>
+                        {{ form.price }}
+                        {% if form.price.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {% for error in form.price.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.condition.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Condition *
+                        </label>
+                        {{ form.condition }}
+                        {% if form.condition.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {% for error in form.condition.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.stock_quantity.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Stock Quantity *
+                        </label>
+                        {{ form.stock_quantity }}
+                        {% if form.stock_quantity.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {% for error in form.stock_quantity.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    {{ form.is_featured }}
+                    <label for="{{ form.is_featured.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                        Feature this product (will be displayed prominently)
+                    </label>
+                </div>
+                
+                <!-- Product Images Section -->
+                <div class="border-t pt-6">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4">Product Images</h3>
+                    
+                    <div class="space-y-4">
+                        <!-- Primary Image -->
+                        <div>
+                            <label for="{{ form.image1.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Primary Product Image
+                                <span class="text-red-500">*</span>
+                                <span class="text-gray-500 text-sm">(This will be the main image shown)</span>
+                            </label>
+                            {{ form.image1 }}
+                            {% if form.image1.help_text %}
+                                <p class="text-sm text-gray-500 mt-1">{{ form.image1.help_text }}</p>
+                            {% endif %}
+                            {% if form.image1.errors %}
+                                <div class="text-red-600 text-sm mt-1">
+                                    {% for error in form.image1.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Additional Images -->
+                        <div>
+                            <label for="{{ form.image2.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Additional Image #2
+                                <span class="text-gray-500 text-sm">(Optional)</span>
+                            </label>
+                            {{ form.image2 }}
+                            {% if form.image2.help_text %}
+                                <p class="text-sm text-gray-500 mt-1">{{ form.image2.help_text }}</p>
+                            {% endif %}
+                            {% if form.image2.errors %}
+                                <div class="text-red-600 text-sm mt-1">
+                                    {% for error in form.image2.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.image3.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Additional Image #3
+                                <span class="text-gray-500 text-sm">(Optional)</span>
+                            </label>
+                            {{ form.image3 }}
+                            {% if form.image3.help_text %}
+                                <p class="text-sm text-gray-500 mt-1">{{ form.image3.help_text }}</p>
+                            {% endif %}
+                            {% if form.image3.errors %}
+                                <div class="text-red-600 text-sm mt-1">
+                                    {% for error in form.image3.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-sm text-gray-600">
+                        <p><i class="fas fa-info-circle mr-1"></i> Tips for better product images:</p>
+                        <ul class="ml-6 mt-1 space-y-1">
+                            <li>• Use high-quality images (at least 800x800 pixels)</li>
+                            <li>• Show your product from multiple angles</li>
+                            <li>• Use good lighting and clean backgrounds</li>
+                            <li>• Upload a primary image first - it's the most important</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                {% if form.non_field_errors %}
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="text-red-600 text-sm">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-blue-800 mb-2">Product Guidelines</h3>
+                    <ul class="text-sm text-blue-700 space-y-1">
+                        <li>• Use clear, descriptive product names</li>
+                        <li>• Write detailed descriptions to help customers</li>
+                        <li>• Set competitive and fair pricing</li>
+                        <li>• Use high-quality product images</li>
+                        <li>• Choose the most appropriate category</li>
+                    </ul>
+                </div>
+                
+                <div class="flex justify-end space-x-4">
+                    <a href="{% url 'vendors:dashboard' %}" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition duration-300">
+                        Cancel
+                    </a>
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+                        <i class="fas fa-plus mr-2"></i>Add Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Style form fields */
+    input[type="text"], input[type="number"], textarea, select, input[type="file"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    input[type="checkbox"] {
+        width: 1rem;
+        height: 1rem;
+    }
+</style>
+{% endblock %}

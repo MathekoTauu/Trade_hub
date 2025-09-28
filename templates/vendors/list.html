@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Vendors - Trade-Hub{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Our Trusted Vendors</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                Discover amazing products from verified vendors around the world. 
+                Each vendor is carefully selected to ensure quality and reliability.
+            </p>
+        </div>
+        
+        <!-- Search and Filter -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <form method="GET" class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <input type="text" name="search" value="{{ request.GET.search }}" 
+                           placeholder="Search vendors by name or description..."
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                        <i class="fas fa-search mr-2"></i>Search
+                    </button>
+                    <a href="{% url 'vendors:list' %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition duration-300">
+                        <i class="fas fa-times mr-2"></i>Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Vendors Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {% for vendor in vendors %}
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 overflow-hidden">
+                    <div class="p-6">
+                        <!-- Store Logo -->
+                        <div class="flex items-center mb-4">
+                            {% if vendor.store_logo %}
+                                <img src="{{ vendor.store_logo.url }}" alt="{{ vendor.store_name }}" 
+                                     class="w-16 h-16 rounded-full object-cover mr-4">
+                            {% else %}
+                                <div class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                                    <i class="fas fa-store text-white text-xl"></i>
+                                </div>
+                            {% endif %}
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold text-gray-800">{{ vendor.store_name }}</h3>
+                                <div class="flex items-center mt-1">
+                                    {% if vendor.is_verified %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="fas fa-check-circle mr-1"></i>Verified
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            <i class="fas fa-clock mr-1"></i>Pending
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Store Description -->
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            {% if vendor.store_description %}
+                                {{ vendor.store_description|truncatewords:20 }}
+                            {% else %}
+                                No description available.
+                            {% endif %}
+                        </p>
+                        
+                        <!-- Store Info -->
+                        <div class="space-y-2 mb-4">
+                            {% if vendor.phone %}
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <i class="fas fa-phone mr-2"></i>
+                                    <span>{{ vendor.phone }}</span>
+                                </div>
+                            {% endif %}
+                            {% if vendor.twitter_handle %}
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <i class="fab fa-twitter mr-2"></i>
+                                    <span>@{{ vendor.twitter_handle }}</span>
+                                </div>
+                            {% endif %}
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-calendar mr-2"></i>
+                                <span>Joined {{ vendor.created_at|date:"M Y" }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Button -->
+                        <a href="{% url 'vendors:detail' pk=vendor.pk %}" 
+                           class="w-full bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 inline-block">
+                            <i class="fas fa-eye mr-2"></i>View Store
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-store text-gray-400 text-6xl mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">No Vendors Found</h3>
+                    <p class="text-gray-500 mb-6">
+                        {% if request.GET.search %}
+                            No vendors match your search criteria. Try adjusting your search terms.
+                        {% else %}
+                            There are no vendors registered yet. Be the first to join!
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'vendors:register' %}" 
+                       class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 inline-block">
+                        <i class="fas fa-plus mr-2"></i>Become a Vendor
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="mt-12 flex justify-center">
+            <nav class="flex space-x-2">
+                <a href="#" class="px-3 py-2 text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                <a href="#" class="px-3 py-2 bg-blue-600 text-white rounded">1</a>
+                <a href="#" class="px-3 py-2 text-gray-500 hover:text-gray-700">2</a>
+                <a href="#" class="px-3 py-2 text-gray-500 hover:text-gray-700">3</a>
+                <a href="#" class="px-3 py-2 text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="mt-16 bg-blue-600 rounded-lg p-8 text-center">
+            <h2 class="text-2xl font-bold text-white mb-4">Want to Become a Vendor?</h2>
+            <p class="text-blue-100 mb-6">Join thousands of successful vendors on Trade-Hub and grow your business!</p>
+            <a href="{% url 'vendors:register' %}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+                <i class="fas fa-store mr-2"></i>Start Selling Today
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ vendor.store_name }} - Trade-Hub{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen">
+    <!-- Vendor Header -->
+    <div class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-8">
+                <!-- Store Logo/Avatar -->
+                {% if vendor.store_logo %}
+                    <img src="{{ vendor.store_logo.url }}" alt="{{ vendor.store_name }}" 
+                         class="w-24 h-24 rounded-full object-cover">
+                {% else %}
+                    <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-store text-white text-3xl"></i>
+                    </div>
+                {% endif %}
+                
+                <!-- Store Info -->
+                <div class="flex-1">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ vendor.store_name }}</h1>
+                    <p class="text-gray-600 mb-4">
+                        {% if vendor.store_description %}
+                            {{ vendor.store_description }}
+                        {% else %}
+                            Welcome to {{ vendor.store_name }}! Browse our quality products and experience excellent customer service.
+                        {% endif %}
+                    </p>
+                    
+                    <div class="flex flex-wrap items-center gap-6 text-sm text-gray-600">
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span class="font-medium">{{ vendor_rating|floatformat:1|default:"-" }}</span>
+                            <span class="ml-1">({{ vendor_reviews_count }} review{{ vendor_reviews_count|pluralize }})</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-box text-gray-400 mr-1"></i>
+                            <span>{{ vendor_products_count }} Product{{ vendor_products_count|pluralize }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar text-gray-400 mr-1"></i>
+                            <span>Joined {{ vendor.created_at|date:"F Y" }}</span>
+                        </div>
+                        {% if vendor.twitter_handle %}
+                        <div class="flex items-center">
+                            <i class="fab fa-twitter text-blue-400 mr-1"></i>
+                            <a href="https://twitter.com/{{ vendor.twitter_handle }}" class="text-blue-600 hover:text-blue-500">@{{ vendor.twitter_handle }}</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-col space-y-2">
+                    {% if user.is_authenticated and user == vendor.user %}
+                        <!-- Store Owner Management Options -->
+                        <a href="{% url 'vendors:dashboard' %}" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300 flex items-center justify-center">
+                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                        </a>
+                        <a href="{% url 'vendors:update' vendor.pk %}" class="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 transition duration-300 flex items-center justify-center">
+                            <i class="fas fa-edit mr-2"></i>Edit Store
+                        </a>
+                        <a href="{% url 'products:create' %}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center">
+                            <i class="fas fa-plus mr-2"></i>Add Product
+                        </a>
+                        <a href="{% url 'vendors:delete' vendor.pk %}" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300 flex items-center justify-center" onclick="return confirm('Are you sure you want to delete your store? This action cannot be undone and will remove all your products.')">
+                            <i class="fas fa-trash mr-2"></i>Delete Store
+                        </a>
+                    {% else %}
+                        <!-- Regular User Options -->
+                        <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                            <i class="fas fa-heart mr-2"></i>Follow Store
+                        </button>
+                        <button class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition duration-300">
+                            <i class="fas fa-share mr-2"></i>Share
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Categories -->
+                <div class="bg-white rounded-lg shadow-md mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-800">Categories</h2>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-2">
+                            {% for category in vendor_categories %}
+                            <li><a href="{% url 'products:list' %}?category={{ category.slug }}&vendor={{ vendor.id }}" class="text-gray-600 hover:text-gray-800">{{ category.name }} ({{ category.product_count }})</a></li>
+                            {% empty %}
+                            <li class="text-gray-500">No categories available</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Store Info -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-800">Store Information</h2>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        {% if vendor.response_time and vendor.response_time != "Usually responds within 24 hours" %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">Response Time</p>
+                            <p class="text-sm text-gray-600">{{ vendor.response_time }}</p>
+                        </div>
+                        {% elif vendor.response_time %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">Response Time</p>
+                            <p class="text-sm text-gray-600">{{ vendor.response_time }} <span class="text-xs text-gray-400">(default)</span></p>
+                        </div>
+                        {% endif %}
+                        {% if vendor.shipping_policy and vendor.shipping_policy != "Standard shipping rates apply" %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">Shipping Policy</p>
+                            <p class="text-sm text-gray-600">{{ vendor.shipping_policy|truncatewords:15 }}</p>
+                        </div>
+                        {% elif vendor.shipping_policy %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">Shipping Policy</p>
+                            <p class="text-sm text-gray-600">{{ vendor.shipping_policy|truncatewords:15 }} <span class="text-xs text-gray-400">(default)</span></p>
+                        </div>
+                        {% endif %}
+                        {% if vendor.return_policy and vendor.return_policy != "30-day return policy" %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">Return Policy</p>
+                            <p class="text-sm text-gray-600">{{ vendor.return_policy|truncatewords:15 }}</p>
+                        </div>
+                        {% elif vendor.return_policy %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">Return Policy</p>
+                            <p class="text-sm text-gray-600">{{ vendor.return_policy|truncatewords:15 }} <span class="text-xs text-gray-400">(default)</span></p>
+                        </div>
+                        {% endif %}
+                        {% if vendor.address %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">Location</p>
+                            <p class="text-sm text-gray-600">{{ vendor.address|truncatewords:10 }}</p>
+                        </div>
+                        {% endif %}
+                        {% if vendor.phone %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 mb-1">Contact</p>
+                            <p class="text-sm text-gray-600">{{ vendor.phone }}</p>
+                        </div>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-3">
+                <!-- Search and Filter -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <form method="GET" class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <input type="text" name="search" value="{{ request.GET.search }}" 
+                                   placeholder="Search products in this store..."
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="flex gap-2">
+                            <select name="sort" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Sort by</option>
+                                <option value="price_low">Price: Low to High</option>
+                                <option value="price_high">Price: High to Low</option>
+                                <option value="rating">Highest Rated</option>
+                                <option value="newest">Newest</option>
+                            </select>
+                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Products Grid -->
+                {% if vendor_products %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for product in vendor_products %}
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                        <div class="h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+                            {% if product.images.first %}
+                                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" 
+                                     class="h-full w-full object-cover">
+                            {% else %}
+                                <i class="fas fa-box text-gray-400 text-4xl"></i>
+                            {% endif %}
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">
+                                <a href="{% url 'products:detail' product.slug %}" class="hover:text-blue-600">
+                                    {{ product.name }}
+                                </a>
+                            </h3>
+                            {% if product.short_description %}
+                            <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ product.short_description }}</p>
+                            {% endif %}
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-lg font-bold text-blue-600">${{ product.price }}</span>
+                                <div class="flex items-center">
+                                    <div class="flex text-yellow-400 text-xs">
+                                        {% with product.average_rating as rating %}
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% elif forloop.counter <= rating|add:0.5 %}
+                                                <i class="fas fa-star-half-alt"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% endwith %}
+                                    </div>
+                                    <span class="text-gray-600 ml-1 text-xs">({{ product.total_reviews }})</span>
+                                </div>
+                            </div>
+                            <form method="POST" action="{% url 'orders:add_to_cart' product.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1">
+                                {% if product.is_in_stock %}
+                                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300">
+                                    <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                                </button>
+                                {% else %}
+                                <button type="button" disabled class="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-lg cursor-not-allowed">
+                                    Out of Stock
+                                </button>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-box-open text-gray-400 text-6xl mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">No Products Yet</h3>
+                    <p class="text-gray-500">This vendor hasn't added any products yet.</p>
+                </div>
+                {% endif %}
+
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-8 flex justify-center">
+                    <nav class="flex space-x-2">
+                        <a href="#" class="px-3 py-2 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        <a href="#" class="px-3 py-2 bg-blue-600 text-white rounded">1</a>
+                        <a href="#" class="px-3 py-2 text-gray-500 hover:text-gray-700">2</a>
+                        <a href="#" class="px-3 py-2 text-gray-500 hover:text-gray-700">3</a>
+                        <a href="#" class="px-3 py-2 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
